@@ -1,0 +1,1301 @@
+{
+    "name": "scan-jobs-FT",
+    "nodes": [
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://entreprise.francetravail.fr/connexion/oauth2/access_token",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "realm",
+                            "value": "/partenaire"
+                        }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/x-www-form-urlencoded"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "{\"client_id\":\"VOTRE_CLIENT_ID_ICI\",\n\"client_secret\":\"VOTRE_CLIENT_SECRET_ICI\",\n\"grant_type\":\"client_credentials\",\n\"scope\":\"api_offresdemploiv2 o2dsoffre\"}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [-1232, -704],
+            "id": "46527bbf-838a-44f0-859f-68f2ac267266",
+            "name": "get token"
+        },
+        {
+            "parameters": {
+                "jsCode": "let listAllJobs = $input.first().json.filteredJobs\n\nfunction isItThePlace(object){\n  let targetedPlaces = [\"75\", \"33\", \"16\"]\n  console.log(object)\n  for (let i of targetedPlaces){\n    if (object.lieuTravail.libelle.startsWith(i)){\n      return true\n    }\n  }\n  return false\n}\n\nfunction haveExperienceLevel(object){\nif (object.experienceLibelle){\n  let optionsExperience =[\"0 An(s)\", \"1 An(s)\", \"2 An(s)\"]\n  return optionsExperience.includes(object.experienceLibelle);\n}}\n\nlet results = listAllJobs.filter(job => {\n  if(!job) return false\n  return isItThePlace(job) && haveExperienceLevel(job)\n} );\n\nconst keysToKeep = ['id','intitule',\"description\", \"lieuTravail\",\"entreprise\", \"typeContrat\",\"natureContrat\",\"experienceExige\",\"experienceLibelle\",\"formations\",\"competences\", \"dureeTravailLibelleConverti\", \"origineOffre\",\"secteurActiviteLibelle\" ];\n\nconst filteredArray = results.map(obj => {\n  const newObj = {};\n  keysToKeep.forEach(key => {\n    if (obj[key] !== undefined) newObj[key] = obj[key];\n  });\n  return newObj;\n});\n\nreturn filteredArray.map(item => ({ json: item }));"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [-240, -736],
+            "id": "51e6716a-f516-44fe-a66d-18d35e873cbc",
+            "name": "filter with exp & locations"
+        },
+        {
+            "parameters": {
+                "fieldToSplitOut": "listJobs",
+                "options": {
+                    "destinationFieldName": "nameJob"
+                }
+            },
+            "type": "n8n-nodes-base.splitOut",
+            "typeVersion": 1,
+            "position": [-1424, -704],
+            "id": "d982770f-4774-42c0-a525-4425e8b1e9a3",
+            "name": "Split Out"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "06442538-f745-45fb-9fcb-43aa5079471f",
+                            "name": "listJobs",
+                            "value": "[ \"Developpeur+React\",\"Developpeur+Node.js\",\"Developpeur+Fullstack+JavaScript\",\"Developpeur+Front-End+React\",   \"Developpeur+Back-End+Node.js\",   \"Developpeur+Web+Junior\",   \"Developpeur+Application+Web\",   \"Developpeur+Logiciel+Junior\",   \"Developpeur+JavaScript\",   \"Integrateur+Web+React\",   \"Concepteur+Developpeur+d'Applications\",   \"Ingenieur+Logiciel+Junior\", \"Developpeur+Frontend+Junior\",\"Developpeur+Backend+Junior\",\"Developpeur+API+Node.js\",   \"Developpeur+Typescript\",\"Developpeur+NestJS\",\"Developpeur+React+Native\",\"Developpeur+Web+Junior+Alternance\",\"Developpeur+Junior+Stage\"]",
+                            "type": "array"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [-1600, -704],
+            "id": "5688e6dc-89ba-4ff4-b300-6241107f1362",
+            "name": "get job titles"
+        },
+        {
+            "parameters": {
+                "fieldToSplitOut": "listJobs",
+                "options": {
+                    "destinationFieldName": "nameJob"
+                }
+            },
+            "type": "n8n-nodes-base.splitOut",
+            "typeVersion": 1,
+            "position": [-1216, 288],
+            "id": "882be953-23b8-4d48-82cf-d805cf64661f",
+            "name": "Split Out1"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "06442538-f745-45fb-9fcb-43aa5079471f",
+                            "name": "listJobs",
+                            "value": "[ \"Developpeur+React\",\"Developpeur+Node.js\",\"Developpeur+Fullstack+JavaScript\",\"Developpeur+Front-End+React\",   \"Developpeur+Back-End+Node.js\",   \"Developpeur+Web+Junior\",   \"Developpeur+Application+Web\",   \"Developpeur+Logiciel+Junior\",   \"Developpeur+JavaScript\",   \"Integrateur+Web+React\",   \"Concepteur+Developpeur+d'Applications\",   \"Ingenieur+Logiciel+Junior\", \"Developpeur+Frontend+Junior\",\"Developpeur+Backend+Junior\",\"Developpeur+API+Node.js\",   \"Developpeur+Typescript\",\"Developpeur+NestJS\",\"Developpeur+React+Native\",\"Developpeur+Web+Junior+Alternance\",\"Developpeur+Junior+Stage\"]",
+                            "type": "array"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [-1392, 288],
+            "id": "65ee7e57-e22a-47e7-a481-b55ff0ffbbfa",
+            "name": "get job titles1"
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "triggerAtHour": 8
+                        }
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [-1808, -704],
+            "id": "7bfb4ead-2efe-4138-8a89-dc36112552ab",
+            "name": "Trigger every day"
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "daysInterval": 3,
+                            "triggerAtHour": 8
+                        }
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [-1568, 288],
+            "id": "f4b19bca-1976-48a8-9b5c-a8e9f0cd2660",
+            "name": "Trigger every 3 days"
+        },
+        {
+            "parameters": {
+                "jsCode": "let resultsUnfiltered = $input.all()\nlet merged = resultsUnfiltered.flatMap(item => item.json.jobs_results);\n\nreturn [{merged}]\n/* \nfunction isItThePlace(object){\n  let targetedPlaces = [\"75\", \"33\", \"16\"]\n  console.log(object)\n  for (let i of targetedPlaces){\n    if (object.lieuTravail.libelle.startsWith(i)){\n      return true\n    }\n  }\n  return false\n}\n\nfunction haveExperienceLevel(object){\nif (object.experienceLibelle){\n  let optionsExperience =[\"0 An(s)\", \"1 An(s)\", \"2 An(s)\"]\n  return optionsExperience.includes(object.experienceLibelle);\n}}\n\nlet results = merged.filter(job => {\n  if(!job) return false\n  return isItThePlace(job) && haveExperienceLevel(job)\n} );\n\nreturn [\n  { resultats: results }\n]; */"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [-752, 288],
+            "id": "e70c82d6-a692-42d4-864c-4613331eabc2",
+            "name": "focus on results"
+        },
+        {
+            "parameters": {
+                "url": "https://serpapi.com/search?engine=google_jobs&q=developpeur&gl=fr&hl=fr&location=France",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "api_key",
+                            "value": "1ca5c5363703714d3cb38484935391bc2a2da8fbb4888c9d2e172c36665abb42"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [-960, 288],
+            "id": "2144ce55-ad5b-4e25-87f8-bb7bb6cc9da0",
+            "name": "HTTP Request via serApi google jobs"
+        },
+        {
+            "parameters": {
+                "operation": "create",
+                "base": {
+                    "__rl": true,
+                    "value": "app3VHTRhFdCLx9jQ",
+                    "mode": "list",
+                    "cachedResultName": "offres jobs FT",
+                    "cachedResultUrl": "https://airtable.com/app3VHTRhFdCLx9jQ"
+                },
+                "table": {
+                    "__rl": true,
+                    "value": "tblbN62A4cmk1iWhR",
+                    "mode": "list",
+                    "cachedResultName": "offres jobs ID",
+                    "cachedResultUrl": "https://airtable.com/app3VHTRhFdCLx9jQ/tblbN62A4cmk1iWhR"
+                },
+                "columns": {
+                    "mappingMode": "autoMapInputData",
+                    "value": {
+                        "id": "="
+                    },
+                    "matchingColumns": [],
+                    "schema": [
+                        {
+                            "id": "id",
+                            "displayName": "id",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": false,
+                            "removed": false
+                        },
+                        {
+                            "id": "Created at",
+                            "displayName": "Created at",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": true,
+                            "removed": true
+                        },
+                        {
+                            "id": "Source",
+                            "displayName": "Source",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": false,
+                            "removed": true
+                        },
+                        {
+                            "id": "emailed",
+                            "displayName": "emailed",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "boolean",
+                            "readOnly": false,
+                            "removed": true
+                        },
+                        {
+                            "id": "RECORD_ID",
+                            "displayName": "RECORD_ID",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": true,
+                            "removed": true
+                        }
+                    ],
+                    "attemptToConvertTypes": false,
+                    "convertFieldsToString": false
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2.1,
+            "position": [32, -992],
+            "id": "f3b27d84-2d5d-43a0-bb23-7724346b56d0",
+            "name": "Create a record",
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "B2FnfX3jd88bhYGP",
+                    "name": "Airtable Personal Access Token account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [-832, -528],
+            "id": "c5cb6fed-cd8d-41bc-bafe-0ec56ad71f69",
+            "name": "Aggregate"
+        },
+        {
+            "parameters": {},
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.2,
+            "position": [-592, -736],
+            "id": "4a27b402-ecf7-4bfe-8e27-89ead228c9b5",
+            "name": "Merge"
+        },
+        {
+            "parameters": {
+                "url": "=https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?tempsPlein=true&motsCles={{ $('Split Out').item.json.nameJob }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $json.access_token }}"
+                        },
+                        {
+                            "name": "Accept",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "options": {
+                    "batching": {
+                        "batch": {
+                            "batchSize": 5
+                        }
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [-1024, -800],
+            "id": "ca6e7b5f-78c7-4b35-be42-35254d655508",
+            "name": "get all jobs",
+            "retryOnFail": true,
+            "maxTries": 2
+        },
+        {
+            "parameters": {
+                "operation": "search",
+                "base": {
+                    "__rl": true,
+                    "value": "app3VHTRhFdCLx9jQ",
+                    "mode": "list",
+                    "cachedResultName": "offres jobs FT",
+                    "cachedResultUrl": "https://airtable.com/app3VHTRhFdCLx9jQ"
+                },
+                "table": {
+                    "__rl": true,
+                    "value": "tblbN62A4cmk1iWhR",
+                    "mode": "list",
+                    "cachedResultName": "offres jobs ID",
+                    "cachedResultUrl": "https://airtable.com/app3VHTRhFdCLx9jQ/tblbN62A4cmk1iWhR"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2.1,
+            "position": [-1024, -528],
+            "id": "98ce7ef0-6c9e-480a-9b50-8896b15b8a41",
+            "name": "Search for used ids",
+            "executeOnce": true,
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "B2FnfX3jd88bhYGP",
+                    "name": "Airtable Personal Access Token account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "fieldsToAggregate": {
+                    "fieldToAggregate": [
+                        {
+                            "fieldToAggregate": "resultats"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [-832, -800],
+            "id": "c3261ef0-a251-4dc7-b7fc-b74f6898653b",
+            "name": "Aggregate1"
+        },
+        {
+            "parameters": {
+                "jsCode": "const existingIds = $input.last().json.data\nconst idList = existingIds.map(item => item.id)\nconst unfilteredResults = $input.first().json.resultats.flat()\n\nconst filteredJobs = unfilteredResults.filter(job => !idList.includes(job.id));\n\nconsole.log(filteredJobs)\n\nreturn [{filteredJobs}]\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [-416, -736],
+            "id": "2de06e21-e876-45f7-a4b7-45954d8c3213",
+            "name": "filter already seen"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "bd5e1632-64e6-4612-b131-ca26ce9b0f35",
+                            "leftValue": "={{ $json.text }}",
+                            "rightValue": "=\"\"",
+                            "operator": {
+                                "type": "string",
+                                "operation": "empty",
+                                "singleValue": true
+                            }
+                        },
+                        {
+                            "id": "1e73fa9f-26b2-47c7-9735-48af6bfe8298",
+                            "leftValue": "={{ $json.text }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "notExists",
+                                "singleValue": true
+                            }
+                        },
+                        {
+                            "id": "d7ae9760-c8ec-4f39-9a88-c752a79ff9c6",
+                            "leftValue": "={{ $json.text }}",
+                            "rightValue": "__NO_OFFER__",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        },
+                        {
+                            "id": "da59bc4d-b72e-495b-b225-3fddf51e8c01",
+                            "leftValue": "={{ $json.text }}",
+                            "rightValue": "=\"```tool_code\\n__NO_OFFER__\\n```\"",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        },
+                        {
+                            "id": "d6f22002-8ed7-452b-b88c-a71955382eaa",
+                            "leftValue": "={{ $json.text }}",
+                            "rightValue": "<no_offers>",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals",
+                                "name": "filter.operator.equals"
+                            }
+                        }
+                    ],
+                    "combinator": "or"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.2,
+            "position": [912, -736],
+            "id": "9a043479-d67c-4fb3-88d3-1c3cac7187eb",
+            "name": "If"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [-48, -736],
+            "id": "90b69b9c-d8ca-4813-a27d-770c25627645",
+            "name": "Aggregate2"
+        },
+        {
+            "parameters": {
+                "fromEmail": "lerouxgustave3@gmail.com",
+                "toEmail": "gustaveleroux-fft@hotmail.fr",
+                "subject": "no new jobs",
+                "emailFormat": "text",
+                "text": "Pas de nvx job chez FT",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2.1,
+            "position": [1152, -992],
+            "id": "746c67f5-e2a2-4f23-b07e-16d1fd8c2110",
+            "name": "Send no new job offer",
+            "webhookId": "4725901b-44b9-445e-9601-c3c5993189ee",
+            "credentials": {
+                "smtp": {
+                    "id": "EVflHEr35KMIRhyv",
+                    "name": "SMTP account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "fromEmail": "lerouxgustave3@gmail.com",
+                "toEmail": "gustaveleroux-fft@hotmail.fr",
+                "subject": "new jobs chez FT",
+                "html": "={{ $json.html }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2.1,
+            "position": [1488, -800],
+            "id": "74cc7a52-62b0-45f2-bd15-7ac8151a399e",
+            "name": "Send emails with job offers",
+            "webhookId": "4725901b-44b9-445e-9601-c3c5993189ee",
+            "credentials": {
+                "smtp": {
+                    "id": "EVflHEr35KMIRhyv",
+                    "name": "SMTP account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [1120, -464],
+            "id": "f6380e60-a47a-41e6-8bd7-d1e023a71bb5",
+            "name": "Aggregate3"
+        },
+        {
+            "parameters": {
+                "content": "## Trigger\n\n**every day at 9am**",
+                "height": 592,
+                "width": 224
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [-1888, -960],
+            "typeVersion": 1,
+            "id": "16700c89-4f69-4303-bfa3-8fe2628259c9",
+            "name": "Sticky Note"
+        },
+        {
+            "parameters": {
+                "content": "## url list\nCreate a list of urls for the api",
+                "height": 592,
+                "width": 304
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [-1616, -960],
+            "typeVersion": 1,
+            "id": "1afd77d5-5c44-4f74-b864-9a440e6f83f0",
+            "name": "Sticky Note1"
+        },
+        {
+            "parameters": {
+                "content": "## Get token for api\nneed a new token everyday",
+                "height": 592,
+                "width": 176,
+                "color": 3
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [-1280, -960],
+            "typeVersion": 1,
+            "id": "ba1e6da8-96f0-4b3d-b06d-1f3e27cce42c",
+            "name": "Sticky Note2"
+        },
+        {
+            "parameters": {
+                "content": "## get all job offers from FT\nuse the different url to catch all possible posts & aggregate them all",
+                "height": 288,
+                "width": 400,
+                "color": 3
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [-1072, -960],
+            "typeVersion": 1,
+            "id": "01fc5df5-4631-4a56-b6a2-0e18b281918b",
+            "name": "Sticky Note3"
+        },
+        {
+            "parameters": {
+                "content": "## get the ids of all offers already seen",
+                "height": 288,
+                "width": 400,
+                "color": 4
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [-1072, -656],
+            "typeVersion": 1,
+            "id": "4e8cb1ee-a65d-4c1a-b493-021093653178",
+            "name": "Sticky Note4"
+        },
+        {
+            "parameters": {
+                "content": "## stock id of job offer being analyzed",
+                "height": 240,
+                "width": 416,
+                "color": 4
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [-272, -1072],
+            "typeVersion": 1,
+            "id": "51ed85cc-ce3f-478a-8cea-b5f66619dc34",
+            "name": "Sticky Note5"
+        },
+        {
+            "parameters": {
+                "content": "## filter offers by place, exp, already seen",
+                "height": 224,
+                "width": 544
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [-448, -800],
+            "typeVersion": 1,
+            "id": "e704a4ac-2d3c-4bad-8c71-055d14d91c6a",
+            "name": "Sticky Note6"
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = $input.first().json.data\n\nconst records = data.map(job => {\n    const id = job.text.match(/\"id\":\\s*\"([A-Za-z0-9]+)\"/)?.[1];\n    if (!id) return null;\n    return {\n        id: id,\n        fields: {\n            emailed: true\n        }\n    };\n}).filter(r => r !== null);\n\nreturn [{\"listIds\":records}];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [1360, -528],
+            "id": "64a15026-e5cc-4318-92a1-704505443657",
+            "name": "Get all ids sent"
+        },
+        {
+            "parameters": {
+                "content": "## sorting out the offers depending on CV",
+                "height": 384,
+                "width": 704,
+                "color": 5
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [176, -848],
+            "typeVersion": 1,
+            "id": "5897cc28-9cf7-4ed0-a38c-27bbf28b9892",
+            "name": "Sticky Note7"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "={{ $json.prompt }}\n",
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [592, -736],
+            "id": "0156f9f8-72d3-47b6-914d-788e5d459d24",
+            "name": "Basic LLM Chain"
+        },
+        {
+            "parameters": {
+                "model": "phi3:mini",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmOllama",
+            "typeVersion": 1,
+            "position": [592, -576],
+            "id": "5a61f387-e3b0-453e-a48b-366e0c6f9367",
+            "name": "Ollama Model",
+            "credentials": {
+                "ollamaApi": {
+                    "id": "W4FvjoYgPd3ZpvNd",
+                    "name": "Ollama account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "content": "## update airtable",
+                "height": 304,
+                "width": 1056,
+                "color": 4
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [1088, -544],
+            "typeVersion": 1,
+            "id": "7b0c2e6a-28b3-4724-b896-254bfa180aca",
+            "name": "Sticky Note8"
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"offres\": {{ $json.data }},\n  \"cv\": {\n    \"intitule\": \"Développeur Fullstack Node.js / React\",\n    \"competences\": [\n      \"JavaScript\", \"TypeScript\", \"React\", \"Nest.js\", \"Node.js\",\n      \"Prisma\", \"MySQL\", \"PostgreSQL\", \"Docker\",\n      \"API REST\", \"JWT\", \"Cypress\", \"Jest\", \"Git\", \"Figma\"\n    ],\n    \"experiences\": [\n      \"Stage 10 mois en développement fullstack (Node.js, React, API REST, base de données)\",\n      \"Projets personnels : React, NestJS, Prisma, MySQL, JWT, Zustand, Formik\",\n      \"Scripts Node.js et Python : CLI, scraping, automatisation réseau\"\n    ],\n    \"points_forts\": [\n      \"Communication\", \"Rigueur\", \"Travail en équipe\",\n      \"Autonomie\", \"Méthodologies agiles (SCRUM)\",\n      \"Qualité logicielle\", \"Curiosité cybersécurité\"\n    ]\n  }\n}\n",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [208, -736],
+            "id": "85e03cd2-72bb-4484-8498-5aac15781c90",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = {\n  offres: $input.first().json.offres,\n  cv: $input.first().json.cv \n};\n\nreturn {\n  prompt: `Tu reçois un tableau JSON d'offres d'emploi nommé 'offres' et un CV nommé 'cv': ${JSON.stringify(data)}. Ton rôle : garder uniquement les offres qui respectent strictement ces règles :\\n1. Le candidat peut réaliser ≥60 % des missions demandées selon son CV.\\n2. Le poste mentionne du télétravail (complet ou partiel).\\n3. L'offre n'utilise pas le mot \"senior\".\\n4. Le poste est à temps plein.\\n5. Le contrat est un CDI ou un CDD.\\RENVOIE UNIQUEMENT avec cette structure, sans ajouter d'autres champs et sans mettre de placeholders comme {...} ou ... : \\n\n{\\n\n  \"offres\": [\\n\n    {\\n\n      \"id\": \"string\",\\n\n      \"intitule\": \"string\",\\n\n      \"description\": \"string\",\\n\n      \"lieuTravail\": { \"libelle\": \"string\" },\\n\n      \"entreprise\": { \"nom\": \"string\" },\\n\n      \"url\": \"string\",\\n\n      \"typeContrat\": \"string\"\\n\n    }\\n\n  ]\\n\n}\\n\n\\Si aucune offre ne correspond, renvoie le texte brut : __NO_OFFER__`\n};"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [368, -736],
+            "id": "c52f4c68-dc29-44fa-b405-b9c000eaca93",
+            "name": "Code in JavaScript1"
+        },
+        {
+            "parameters": {
+                "content": "## Notification by email\n",
+                "height": 496,
+                "width": 592,
+                "color": 6
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [1088, -1072],
+            "typeVersion": 1,
+            "id": "4fe5287b-53ff-4391-a90b-db5b5b290da0",
+            "name": "Sticky Note9"
+        },
+        {
+            "parameters": {
+                "operation": "search",
+                "base": {
+                    "__rl": true,
+                    "value": "app3VHTRhFdCLx9jQ",
+                    "mode": "list",
+                    "cachedResultName": "offres jobs FT",
+                    "cachedResultUrl": "https://airtable.com/app3VHTRhFdCLx9jQ"
+                },
+                "table": {
+                    "__rl": true,
+                    "value": "tblbN62A4cmk1iWhR",
+                    "mode": "list",
+                    "cachedResultName": "offres jobs ID",
+                    "cachedResultUrl": "https://airtable.com/app3VHTRhFdCLx9jQ/tblbN62A4cmk1iWhR"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2.1,
+            "position": [1360, -384],
+            "id": "82cc06da-d6a5-498b-a3d6-469a06021d75",
+            "name": "Search records",
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "B2FnfX3jd88bhYGP",
+                    "name": "Airtable Personal Access Token account"
+                }
+            }
+        },
+        {
+            "parameters": {},
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.2,
+            "position": [1680, -512],
+            "id": "47530964-b843-48b9-8f95-37babd844474",
+            "name": "Merge1"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [1536, -384],
+            "id": "deedef97-3a7a-42c5-8834-81d384a6aece",
+            "name": "Aggregate4"
+        },
+        {
+            "parameters": {
+                "jsCode": "const listIds = $input.first().json.listIds    \nconst data = $input.last().json.data\nconsole.log(data)\nconsole.log(listIds)\n\nconst recordsToUpdate = listIds.map(item => {\n    const match = data.find(d => d.id === item.id);\n    if (match) {\n        return {\n            id: match.RECORD_ID,\n            fields: { emailed: true } \n        };\n    }\n    return null;\n}).filter(Boolean);\n\nreturn recordsToUpdate.map(r => ({ json: r })); \n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [1824, -512],
+            "id": "a5727475-faaf-4648-89bc-b0c22f682aa7",
+            "name": "Code in JavaScript2"
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "base": {
+                    "__rl": true,
+                    "value": "app3VHTRhFdCLx9jQ",
+                    "mode": "list",
+                    "cachedResultName": "offres jobs FT",
+                    "cachedResultUrl": "https://airtable.com/app3VHTRhFdCLx9jQ"
+                },
+                "table": {
+                    "__rl": true,
+                    "value": "tblbN62A4cmk1iWhR",
+                    "mode": "list",
+                    "cachedResultName": "offres jobs ID",
+                    "cachedResultUrl": "https://airtable.com/app3VHTRhFdCLx9jQ/tblbN62A4cmk1iWhR"
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "emailed": true,
+                        "id": "={{ $json.id }}"
+                    },
+                    "matchingColumns": ["id"],
+                    "schema": [
+                        {
+                            "id": "id",
+                            "displayName": "id",
+                            "required": false,
+                            "defaultMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": true,
+                            "removed": false
+                        },
+                        {
+                            "id": "id",
+                            "displayName": "id",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": false,
+                            "removed": false
+                        },
+                        {
+                            "id": "Created at",
+                            "displayName": "Created at",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": true,
+                            "removed": true
+                        },
+                        {
+                            "id": "Source",
+                            "displayName": "Source",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": false,
+                            "removed": true
+                        },
+                        {
+                            "id": "emailed",
+                            "displayName": "emailed",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "boolean",
+                            "readOnly": false,
+                            "removed": false
+                        },
+                        {
+                            "id": "RECORD_ID",
+                            "displayName": "RECORD_ID",
+                            "required": false,
+                            "defaultMatch": false,
+                            "canBeUsedToMatch": true,
+                            "display": true,
+                            "type": "string",
+                            "readOnly": true,
+                            "removed": true
+                        }
+                    ],
+                    "attemptToConvertTypes": false,
+                    "convertFieldsToString": false
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2.1,
+            "position": [2000, -512],
+            "id": "b8c06f3d-c0b4-416d-9cae-c94143892a8a",
+            "name": "Update record",
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "B2FnfX3jd88bhYGP",
+                    "name": "Airtable Personal Access Token account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "let text = $json.text || \"\";\n\n// 1️⃣ Enlever ```json et ```\ntext = text.replace(/```json\\s*|```/g, '');\n\n// 2️⃣ Supprimer tous les placeholders `{...}` et `...`\ntext = text.replace(/\\{\\.\\.\\.\\}/g, '{}').replace(/\\.\\.\\./g, '');\n\n// 3️⃣ Supprimer les retours à la ligne inutiles\ntext = text.replace(/\\r?\\n/g, '');\n\n// 4️⃣ Essayer de parser le JSON\nlet parsed;\ntry {\n    parsed = JSON.parse(text);\n} catch(e) {\n    return [{ json: { error: \"JSON encore invalide\", details: e.message, raw: text } }];\n}\n\n// 5️⃣ Retourner le JSON nettoyé pour n8n\nreturn [{ json: parsed }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [1152, -800],
+            "id": "c41007c6-82ff-47ee-a738-4ba883a2b4fa",
+            "name": "clean text"
+        },
+        {
+            "parameters": {
+                "jsCode": "// On récupère le JSON nettoyé depuis le node précédent\nconst offres = $json.offres || [];\n\nconst htmlArray = offres.map(o => {\n  return {\n    json: {\n      html: `\n<div style=\"font-family: Arial, sans-serif; margin-bottom:20px; padding:15px; border:1px solid #ddd; border-radius:8px;\">\n  <h2 style=\"margin:0; color:#333;\">Titre du poste : ${o.intitule || \"Non précisé\"}</h2>\n  <p><strong>ID de l’offre :</strong> ${o.id || \"Non précisé\"}</p>\n  <p><strong>Localisation :</strong> ${o.lieuTravail?.libelle || \"Non précisé\"}</p>\n  <p><strong>Entreprise :</strong> ${o.entreprise?.nom || \"Non précisé\"}</p>\n  <p><strong>Type de contrat :</strong> ${o.typeContrat || o.natureContrat || \"Non précisé\"}</p>\n  <p><strong>Lien pour postuler :</strong> <a href=\"${o.url || \"#\"}\">Voir l’offre</a></p>\n\n  <h3 style=\"margin-top:15px; color:#444;\">Résumé</h3>\n  <p>${o.description ? o.description.substring(0, 500) + \"...\" : \"\"}</p>\n</div>`\n    }\n  };\n});\n\n// Retourner un objet par offre (prêt pour un Email Node)\nreturn htmlArray;\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [1328, -800],
+            "id": "20c067bd-2ebc-4ad7-81ea-46acbe2bbdbf",
+            "name": "get to html"
+        },
+        {
+            "parameters": {
+                "fieldToSplitOut": "onlyIds",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.splitOut",
+            "typeVersion": 1,
+            "position": [-112, -992],
+            "id": "6d6e3899-5bea-402f-af16-ea7a52165b8e",
+            "name": "Split Out2"
+        },
+        {
+            "parameters": {
+                "jsCode": "let listViewedJobs = $input.first().json.filteredJobs\n\nlet onlyIds = []\nlistViewedJobs.forEach(item => {if(item) {onlyIds.push({\"id\": item.id, \"Source\":\"FT\"})}})\n\n\nreturn [{onlyIds}]"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [-240, -992],
+            "id": "37233769-5f00-44ce-b42d-29f8be9d03be",
+            "name": "get ids only",
+            "retryOnFail": true
+        }
+    ],
+    "pinData": {},
+    "connections": {
+        "get token": {
+            "main": [
+                [
+                    {
+                        "node": "get all jobs",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Search for used ids",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "filter with exp & locations": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split Out": {
+            "main": [
+                [
+                    {
+                        "node": "get token",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "get job titles": {
+            "main": [
+                [
+                    {
+                        "node": "Split Out",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "get job titles1": {
+            "main": [
+                [
+                    {
+                        "node": "Split Out1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split Out1": {
+            "main": [[]]
+        },
+        "Trigger every day": {
+            "main": [
+                [
+                    {
+                        "node": "get job titles",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Trigger every 3 days": {
+            "main": [
+                [
+                    {
+                        "node": "get job titles1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "focus on results": {
+            "main": [[]]
+        },
+        "HTTP Request via serApi google jobs": {
+            "main": [
+                [
+                    {
+                        "node": "focus on results",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Create a record": {
+            "main": [[]]
+        },
+        "Aggregate": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "get all jobs": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Search for used ids": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate1": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge": {
+            "main": [
+                [
+                    {
+                        "node": "filter already seen",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "filter already seen": {
+            "main": [
+                [
+                    {
+                        "node": "filter with exp & locations",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "get ids only",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate2": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If": {
+            "main": [
+                [
+                    {
+                        "node": "Send no new job offer",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "clean text",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Aggregate3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Send emails with job offers": {
+            "main": [[]]
+        },
+        "Aggregate3": {
+            "main": [
+                [
+                    {
+                        "node": "Get all ids sent",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Search records",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get all ids sent": {
+            "main": [
+                [
+                    {
+                        "node": "Merge1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Ollama Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Basic LLM Chain": {
+            "main": [
+                [
+                    {
+                        "node": "If",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript1": {
+            "main": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Search records": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge1": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate4": {
+            "main": [
+                [
+                    {
+                        "node": "Merge1",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript2": {
+            "main": [
+                [
+                    {
+                        "node": "Update record",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "clean text": {
+            "main": [
+                [
+                    {
+                        "node": "get to html",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "get to html": {
+            "main": [
+                [
+                    {
+                        "node": "Send emails with job offers",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split Out2": {
+            "main": [
+                [
+                    {
+                        "node": "Create a record",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "get ids only": {
+            "main": [
+                [
+                    {
+                        "node": "Split Out2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "versionId": "762820e8-39b6-49d1-92ce-7ef9453bbf75",
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "ee6b7bd2adfeebe55ff02f71fc0385488a2efe66c3f691f597bec6abaaaefe40"
+    },
+    "id": "Kl1D9UWuh3JZUdrB",
+    "tags": []
+}
