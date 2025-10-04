@@ -161,7 +161,7 @@
                     "parameters": [
                         {
                             "name": "api_key",
-                            "value": "1ca5c5363703714d3cb38484935391bc2a2da8fbb4888c9d2e172c36665abb42"
+                            "value": "YOUR_SERPAPI_KEY_ICI"
                         }
                     ]
                 },
